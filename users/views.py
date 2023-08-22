@@ -1,20 +1,34 @@
 from time import sleep
 
+from drf_spectacular.utils import extend_schema, inline_serializer
+from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
+from users.models import CustomUser
 from users.serializers import CodeEnterSerializer, CustomUserInviteSerializer, \
     CustomUserProfileSerializer, PhoneEnterSerializer
 
 from users.services import check_write_invite, generate_code
 
 
+
 class PhoneEnterView(APIView):
     """
     Enter phone number. Format +11234567890.
-    After follow page /code/
+    After follow page code/
     """
 
+    @extend_schema(
+            parameters=[PhoneEnterSerializer],
+            request=PhoneEnterSerializer,
+            responses={200: inline_serializer(
+                    name='PhoneEnterViewResponse',
+                    fields={'code': serializers.IntegerField()}
+                    )
+                }
+            )
     def post(self, request, **kwargs):
         serializer = PhoneEnterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -31,6 +45,11 @@ class CodeEnterView(APIView):
     Authentication or registration and authorization after entered code.
     """
 
+    @extend_schema(
+            parameters=[CodeEnterSerializer],
+            request=CodeEnterSerializer,
+            responses={201: TokenObtainPairSerializer},
+            )
     def post(self, request, **kwargs):
         serializer = CodeEnterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -47,9 +66,10 @@ class CodeEnterView(APIView):
             request.session.pop('code', '')
             request.session.pop('phone', '')
 
-            return Response(token.validated_data)
+            return Response(token.validated_data, 201)
         else:
             return Response('Wrong code')
+
 
 
 class CustomUserProfileView(APIView):
@@ -57,10 +77,21 @@ class CustomUserProfileView(APIView):
     Profile CustomUser
     """
 
+    @extend_schema(
+            parameters=[CustomUserProfileSerializer],
+            request=CustomUserProfileSerializer,
+            responses=CustomUserProfileSerializer,
+            )
     def get(self, request, *args, **kwargs):
         serializer = CustomUserProfileSerializer(request.user)
+        print(CustomUser.objects.values())
         return Response(serializer.data)
 
+    @extend_schema(
+            parameters=[CustomUserInviteSerializer],
+            request=CustomUserInviteSerializer,
+            responses={201: str},
+            )
     def put(self, request, *args, **kwargs):
         serializer = CustomUserInviteSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

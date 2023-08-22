@@ -13,12 +13,11 @@ class PhoneEnterSerializer(serializers.ModelSerializer):
         fields = ('phone',)
 
 
-class CodeEnterSerializer(serializers.ModelSerializer):
+class CodeEnterSerializer(serializers.Serializer):
     """ Code serializer. """
     code = serializers.IntegerField()
 
     class Meta:
-        model = CustomUser
         fields = ('code',)
 
 
@@ -36,12 +35,14 @@ class CustomUserProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = '__all__'
+        fields = ('id', 'parent_invite', 'children_phone',
+                  'last_login', 'phone', 'invite'
+                  )
 
 
 class CustomUserInviteSerializer(serializers.ModelSerializer):
     """ Serializer enter invite in profile user."""
-    invite = serializers.CharField(max_length=6)
+    invite = serializers.CharField(max_length=6, min_length=6)
     class Meta:
         model = CustomUser
         fields = ('invite',)
