@@ -2,6 +2,7 @@ from time import sleep
 
 from drf_spectacular.utils import extend_schema, inline_serializer
 from rest_framework import serializers
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -76,6 +77,7 @@ class CustomUserProfileView(APIView):
     """
     Profile CustomUser
     """
+    permission_classes = [IsAuthenticated]
 
     @extend_schema(
             parameters=[CustomUserProfileSerializer],
@@ -84,7 +86,6 @@ class CustomUserProfileView(APIView):
             )
     def get(self, request, *args, **kwargs):
         serializer = CustomUserProfileSerializer(request.user)
-        print(CustomUser.objects.values())
         return Response(serializer.data)
 
     @extend_schema(
