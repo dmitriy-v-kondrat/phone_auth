@@ -15,7 +15,7 @@ class PhoneEnterSerializer(serializers.ModelSerializer):
 
 class CodeEnterSerializer(serializers.Serializer):
     """ Code serializer. """
-    code = serializers.IntegerField()
+    code = serializers.CharField()
 
     class Meta:
         fields = ('code',)

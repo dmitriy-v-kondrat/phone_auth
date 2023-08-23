@@ -7,7 +7,6 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from users.models import CustomUser
 from users.serializers import CodeEnterSerializer, CustomUserInviteSerializer, \
     CustomUserProfileSerializer, PhoneEnterSerializer
 
